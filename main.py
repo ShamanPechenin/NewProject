@@ -92,7 +92,7 @@ def solve(func: Callable, solver: Callable) -> dict[str: float]:
 
 def pretty_print_solution(solution: dict[str: float]):
     print(f"Approximated x is: {solution['x']}")
-    print(f"Value of function at x is: {solution['y_at_x']}")
+    print(f"Error at x is: {solution['y_at_x']}")
 
 
 def interactive_main():
