@@ -12,18 +12,17 @@ def calculate_derivative(func: Callable, point: float, eps=1e-9) -> float:
     return (func(point+eps)-func(point))/eps
 
 
-def newton_iteration(func: Callable, approx_x: float, y: float) -> float:
+def newton_iteration(func: Callable, approx_x: float) -> float:
     """
-    Solves f(x)=y for x using newton iteration method
+    Solves f(x)=0 for x using newton iteration method
     :param func:
     :param approx_x:
-    :param y:
     :return:
     """
-    return approx_x - (func(approx_x)-y)/calculate_derivative(func, approx_x)
+    return approx_x - func(approx_x)/calculate_derivative(func, approx_x)
 
 
-def brute_force(func: Callable, y: float, x_range: tuple[float, float], n_calls: int):
+def brute_force(func: Callable, x_range: tuple[float, float], n_calls: int):
     """
     Solves f(x)=y for x using brute force method
     :param func:
@@ -36,20 +35,34 @@ def brute_force(func: Callable, y: float, x_range: tuple[float, float], n_calls:
     best_diff = None
     for i in range(n_calls):
         x = x_range[0]+i*(x_range[1]-x_range[0])/n_calls
-        diff = func(x)-y
+        diff = func(x)
         if best_diff is None:
-            best_diff = y
+            best_diff = diff
             best_x = x
             continue
 
         if abs(diff) < best_diff:
-            best_diff = y
+            best_diff = diff
             best_x = x
     return best_x
 
 
 def get_equation_from_user():
-    pass
+    variants = {"1": 2, "2": 2, "3": 2}
+    user_selection = input("\n1. a*x=b\n2. x^a=b\n3. a^x=b\nSelect equation to solve: ").strip()
+    if not user_selection in variants:
+        print("Invalid selection. Try again.")
+        raise ValueError
+    constants = []
+    for i in range(variants[user_selection]):
+        user_input = float(input(f"Enter constant {chr(97+i)} value: ").strip())
+        constants.append(user_input)
+    if user_selection == "1":
+        return lambda x: constants[0] * x - constants[1]
+    elif user_selection == "2":
+        return lambda x: x ** constants[0] - constants[1]
+    elif user_selection == "3":
+        return lambda x: constants[0] ** x - constants[1]
 
 
 def get_method_from_user():
