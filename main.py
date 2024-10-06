@@ -28,7 +28,7 @@ def newton_method(func: Callable, approx_x: float, n_iter: int) -> float:
     return approx_x
 
 
-def brute_force(func: Callable, x_range: tuple[float, float], n_calls: int):
+def brute_force(func: Callable, x_range: tuple[float, float], n_calls: int) -> float:
     """
     Solves f(x)=0 for x using brute force method
     :param func:
@@ -90,7 +90,7 @@ def solve(func: Callable, solver: Callable) -> dict[str: float]:
     return {"x": approx_x, "y_at_x": y_at_x}
 
 
-def pretty_print_solution(solution: dict[str: float]):
+def pretty_print_solution(solution: dict[str: float]) -> None:
     print(f"Approximated x is: {solution['x']}")
     print(f"Error at x is: {solution['y_at_x']}")
 
