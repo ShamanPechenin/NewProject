@@ -1,4 +1,26 @@
 from typing import Callable
+from re import split, match
+
+
+def sequence_multiply(seq) -> float:
+    k = 1
+    for element in seq:
+        k *= element
+    return k
+
+
+def sequence_divide(seq) -> float:
+    k = seq[0]
+    for element in seq[1:]:
+        k /= element
+    return k
+
+
+def sequence_power(seq) -> float:
+    k = seq[0]
+    for element in seq[1:]:
+        k **= element
+    return k
 
 
 def calculate_derivative(func: Callable, point: float, eps=1e-9) -> float:
@@ -52,22 +74,38 @@ def brute_force(func: Callable, x_range: tuple[float, float], n_calls: int) -> f
     return best_x
 
 
+def parse_equation(equation_str: str) -> Callable:
+    if equation_str == "x":
+        return lambda x: x
+    if equation_str == "-x":
+        return lambda x: -x
+    if match("^[0-9\.\-]+$", equation_str):
+        return lambda x: float(equation_str)
+    sums = equation_str.split("+")
+    if len(sums) > 1:
+        return lambda x: sum([parse_equation(element)(x) for element in sums])
+    muls = equation_str.split("*")
+    if len(muls) > 1:
+        return lambda x: sequence_multiply([parse_equation(element)(x) for element in muls])
+    divs = equation_str.split("/")
+    if len(divs) > 1:
+        return lambda x: sequence_divide([parse_equation(element)(x) for element in divs])
+    pows = equation_str.split("^")
+    if len(pows) > 1:
+        return lambda x: sequence_power([parse_equation(element)(x) for element in pows])
+
+
 def get_equation_from_user() -> Callable:
-    variants = {"1": 2, "2": 2, "3": 2}
-    user_selection = input("\n1. a*x=b\n2. x^a=b\n3. a^x=b\nSelect equation to solve: ").strip()
-    if user_selection not in variants:
-        print("Invalid selection. Try again.")
-        raise ValueError
-    constants = []
-    for i in range(variants[user_selection]):
-        user_input = float(input(f"Enter constant {chr(97+i)} value: ").strip())
-        constants.append(user_input)
-    if user_selection == "1":
-        return lambda x: constants[0] * x - constants[1]
-    elif user_selection == "2":
-        return lambda x: x ** constants[0] - constants[1]
-    elif user_selection == "3":
-        return lambda x: constants[0] ** x - constants[1]
+    equation_str = input("Enter the equation: ")
+    new_equation = ""
+    for i in range(len(equation_str)):
+        if equation_str[i] == "-" and equation_str[i-1] not in "+*/^":
+            new_equation += "+" + equation_str[i]
+        else:
+            new_equation += equation_str[i]
+    equation_str = new_equation
+    left_part, right_part = equation_str.split("=")
+    return lambda x: parse_equation(left_part)(x) - parse_equation(right_part)(x)
 
 
 def get_method_from_user() -> Callable:
